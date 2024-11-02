@@ -1,0 +1,26 @@
+from bs4 import BeautifulSoup
+import requests
+
+def scrape_youtube_video_data(video_url):
+    response = requests.get(video_url)
+    if response.status_code != 200:
+        print("Failed to retrieve the webpage")
+        return None
+    soup = BeautifulSoup(response.text, 'html.parser')
+    title_element = soup.find("h1", class_="title")
+    title = title_element.text.strip() if title_element else "Title not found"
+    views_element = soup.find("span", class_="view-count")
+    views = views_element.text.strip() if views_element else "Views not found"
+    likes_element = soup.find("span", class_="like-button-renderer")
+    likes = likes_element.span.button.text.strip() if likes_element and likes_element.span and likes_element.span.button else "Likes not found"
+
+    video_data = {
+        'title': title,
+        'views': views,
+        'likes': likes
+    }
+    return video_data
+
+video_url = "https://youtu.be/N1q4NfvPsGw?si=XNVVHElkEGdeyVJB"
+data = scrape_youtube_video_data(video_url)
+print(data)
